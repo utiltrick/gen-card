@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student ID Card</title>
+  <style>
+    body {
+      font-family: Georgia, serif;
+      background: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .id-card {
+      width: 800px;
+      height: 520px;
+      background: white;
+      border-radius: 10px;
+      border: 4px solid #003e91;
+      padding: 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    .header {
+      background-color: #003e91;
+      color: white;
+      padding: 24px 10px 20px 130px;
+      position: relative;
+      height: 100px;
+    }
+    .header img {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 110px;
+      height: auto;
+    }
+    .header h1 {
+      font-size: 30px;
+      margin: 0;
+      text-align: center;
+    }
+    .header h3 {
+      margin: 2px 0;
+      font-size: 17px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .sub-header {
+      background-color: #d12027;
+      color: white;
+      text-align: center;
+      padding: 4px 10px;
+      font-weight: bold;
+      font-size: 26px;
+      letter-spacing: 1px;
+    }
+    .content {
+      display: flex;
+      padding: 10px 20px;
+      justify-content: space-between;
+      position: relative;
+    }
+    .info {
+      flex: 2;
+    }
+    .info table {
+      width: 100%;
+      font-size: 16px;
+    }
+    .info td {
+      padding: 4px 10px;
+    }
+    .info .label {
+      width: 180px;
+      font-weight: bold;
+    }
+    .photo {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .photo img {
+      width: 140px;
+      height: 180px;
+      border: 1px solid #333;
+      object-fit: cover;
+    }
+    .signature {
+      margin-top: 10px;
+    }
+    .signature img {
+      width: 120px;
+      height: auto;
+      border: none;
+    }
+    .barcode-section {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 500px;
+    }
+    .barcode-section img {
+      width: 80%;
+      height: auto;
+    }
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+    }
+    .director img {
+      width: 130px;
+    }
+    [contenteditable]:focus {
+      outline: 2px dashed #003e91;
+    }
+    .actions {
+      margin: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .actions button, .actions input[type="file"] {
+      background-color: #003e91;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .actions button:hover {
+      background-color: #002a66;
+    }
+    .actions .random-btn {
+      background-color: #17a2b8;
+    }
+    .actions .random-btn:hover {
+      background-color: #138496;
+    }
+    .script-section {
+      margin: 10px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #003e91;
+      width: 800px;
+    }
+    .script-section h3 {
+      color: #003e91;
+      margin-top: 0;
+    }
+    .script-container {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="actions">
+    <input type="file" accept="image/*" onchange="uploadAvatar(event)">
+<!--     <button onclick="randomAvatar()">Random Avatar</button>
+    <button onclick="loadThisPerson()">From thispersondoesnotexist.com</button> -->
+    <button class="random-btn" onclick="randomizeInfo()">🎲 Random Info</button>
+    <button onclick="downloadCard()">Download as Image</button>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+  </div>
+  
+  <div id="card" class="id-card">
+    <div class="header">
+      <img src="https://i.ibb.co/Hpkk9LVg/image.png" alt="Logo" />
+      <h1 contenteditable>BABU BANARASI DAS</h1>
+      <h3 contenteditable>Institute of Technology and Management, Lucknow</h3>
+      <h3 contenteditable>Affiliated to Dr. A.P.J. Abdul Kalam Technical University</h3>  
+      <h3 contenteditable>(AKTU College Code: 054)</h3>
+    </div>
+    <div class="sub-header">STUDENT IDENTITY CARD</div>
+    <div class="content">
+      <div class="info">
+        <table>
+          <tr>
+            <td class="label">NAME</td>
+            <td contenteditable id="student-name">RAHUL VERMA</td>
+          </tr>
+          <tr>
+            <td class="label">COURSE</td>
+            <td contenteditable id="course">B. Tech / CS</td>
+          </tr>
+          <tr>
+            <td class="label">FATHER'S NAME</td>
+            <td contenteditable id="father-name">SURESH KUMAR VERMA</td>
+          </tr>
+          <tr>
+            <td class="label">MOBILE NO.</td>
+            <td contenteditable id="mobile">9876543210</td>
+          </tr>
+          <tr>
+            <td class="label">SESSION</td>
+            <td contenteditable id="session">2023 - 2027</td>
+          </tr>
+          <tr>
+            <td class="label">REG. NO.</td>
+            <td contenteditable id="regno">PTGYHH/ITM/2024/00789</td>
+          </tr>
+        </table>
+      </div>
+      <div class="photo">
+        <img id="avatar" src="https://thispersondoesnotexist.com" alt="Student Photo" />
+        <div class="signature">
+          <img src="https://i.ibb.co/Xr5bmgwM/Screenshot-2025-07-31-175409.png" alt="Signature" />
+        </div>
+      </div>
+    </div>
+    <div class="barcode-section">
+      <img id="barcode" src="https://barcode.tec-it.com/barcode.ashx?data=PTGYHH%2FITM%2F2024%2F00789&code=Code128&translate-esc=false" alt="Barcode" />
+    </div>
+  </div>
+
+  <div class="script-section">
+    <h3>🤖 Auto-fill Script Generator</h3>
+    <p>Tạo và copy script tự động điền thông tin từ thẻ sinh viên này:</p>
+    <button onclick="generateAndCopyScript()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;" id="scriptBtn">📋 Generate & Copy Script</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Dữ liệu để random
+    const firstNames = [
+      'RAHUL', 'PRIYA', 'AMIT', 'SNEHA', 'VIKASH', 'POOJA', 'RAVI', 'DEEPIKA',
+      'AJAY', 'KAVYA', 'SANJAY', 'NISHA', 'ROHIT', 'SWATI', 'ANKIT', 'MEERA',
+      'SUNIL', 'ANJALI', 'MANOJ', 'REKHA', 'VISHAL', 'SUNITA', 'ASHOK', 'SEEMA'
+    ];
+
+    const lastNames = [
+      'SHARMA', 'VERMA', 'GUPTA', 'SINGH', 'KUMAR', 'YADAV', 'MISHRA', 'TIWARI',
+      'AGARWAL', 'JAIN', 'PANDEY', 'SRIVASTAVA', 'TRIPATHI', 'CHAUDHARY', 'BANSAL', 'CHOPRA'
+    ];
+
+    const courses = [
+      'B. Tech / CS', 'B. Tech / IT', 'B. Tech / ECE', 'B. Tech / ME', 'B. Tech / CE',
+      'B. Tech / EE', 'BCA', 'MCA', 'MBA', 'BBA'
+    ];
+
+    function randomChoice(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function generateRandomPhone() {
+      return '9' + Math.floor(Math.random() * 900000000 + 100000000);
+    }
+
+    function generateRegNo() {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const prefix = Array.from({length: 6}, () => randomChoice(letters)).join('');
+      const year = new Date().getFullYear();
+      const number = String(Math.floor(Math.random() * 99999 + 1)).padStart(5, '0');
+      return `${prefix}/ITM/${year}/${number}`;
+    }
+
+    function generateSession() {
+      const currentYear = new Date().getFullYear();
+      const startYear = currentYear - Math.floor(Math.random() * 3);
+      return `${startYear} - ${startYear + 4}`;
+    }
+
+    function randomizeInfo() {
+      const firstName = randomChoice(firstNames);
+      const lastName = randomChoice(lastNames);
+      const fullName = `${firstName} ${lastName}`;
+      const course = randomChoice(courses);
+      const fatherName = `${randomChoice(firstNames)} ${lastName}`;
+      const mobile = generateRandomPhone();
+      const session = generateSession();
+      const regNo = generateRegNo();
+
+      // Cập nhật giao diện
+      document.getElementById('student-name').textContent = fullName;
+      document.getElementById('course').textContent = course;
+      document.getElementById('father-name').textContent = fatherName;
+      document.getElementById('mobile').textContent = mobile;
+      document.getElementById('session').textContent = session;
+      document.getElementById('regno').textContent = regNo;
+
+      // Cập nhật barcode
+      const encodedRegNo = encodeURIComponent(regNo);
+      document.getElementById('barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${encodedRegNo}&code=Code128&translate-esc=false`;
+
+      // Random avatar cũng
+      randomAvatar();
+
+      // Nếu script đã được tạo thì tự động tạo lại
+      // (không cần thiết nữa vì không còn hiển thị script)
+    }
+
+    function randomAvatar() {
+      const randomId = Math.floor(Math.random() * 70) + 1;
+      document.getElementById("avatar").src = `https://i.pravatar.cc/300?img=${randomId}`;
+    }
+
+    function loadThisPerson() {
+      document.getElementById("avatar").src = "https://thispersondoesnotexist.com";
+    }
+
+    function uploadAvatar(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("avatar").src = e.target.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function downloadCard() {
+      const card = document.getElementById("card");
+      html2canvas(card, { useCORS: true, scale: 3 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'student-id-card.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    function copyToClipboard() {
+      const card = document.getElementById("card");
+      html2canvas(card, { useCORS: true, scale: 3 }).then(canvas => {
+        canvas.toBlob(blob => {
+          const item = new ClipboardItem({ 'image/png': blob });
+          navigator.clipboard.write([item]);
+          alert("Card copied to clipboard!");
+        });
+      });
+    }
+
+    function generateAndCopyScript() {
+      // Lấy thông tin từ thẻ sinh viên hiện tại
+      const fullName = document.getElementById('student-name').textContent.trim();
+      const nameParts = fullName.split(' ');
+      const firstName = nameParts[0] || 'RAHUL';
+      const lastName = nameParts.slice(1).join(' ') || 'VERMA';
+      
+      // Tạo thông tin giả lập cho form
+      const day = Math.floor(Math.random() * 28) + 1;
+      const year = Math.floor(Math.random() * (2007 - 2005 + 1)) + 2005; 
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+      const month = months[Math.floor(Math.random() * months.length)];
+      const email = `${firstName.toLowerCase()}.${lastName.toLowerCase().replace(/\s+/g, '')}@student.edu`;
+
+      const jsScript = `(async () => {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const set = async (sel, val) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const setVal = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+    setVal.call(el, val);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new Event("blur", { bubbles: true }));
+    await delay(150);
+  };
+  const pasteSchool = async (val) => {
+    const el = document.querySelector('#sid-college-name');
+    if (!el) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, val);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    await delay(2000);
+    document.querySelector('#sid-college-name-menu [role="option"]')?.click();
+  };
+  const selectMonth = async () => {
+    const el = document.querySelector('#sid-birthdate__month');
+    if (!el) return;
+    el.focus(); el.click();
+    await delay(400);
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await delay(400);
+    [...document.querySelectorAll('#sid-birthdate__month-menu [role="option"]')]
+      .find(o => o.innerText.toLowerCase().startsWith("${month.toLowerCase()}"))?.click();
+  };
+  await pasteSchool("Babu Banarasi Das National Institute Of Technology And Management");
+  await selectMonth();
+  const fields = [
+    ['#sid-first-name', '${firstName}'],
+    ['#sid-last-name', '${lastName}'],
+    ['#sid-birthdate-day', '${String(day).padStart(2, '0')}'],
+    ['#sid-birthdate-year', '${year}'],
+    ['#sid-email', '${email}']
+  ];
+  for (const [sel, val] of fields) await set(sel, val);
+  for (const [sel, val] of fields) if (!document.querySelector(sel)?.value) await set(sel, val);
+  console.log("✅ Form đã được điền đầy đủ (chưa submit)");
+  console.log("📋 Thông tin đã điền:", {
+    name: "${firstName} ${lastName}",
+    birthdate: "${String(day).padStart(2, '0')}/${month}/${year}",
+    email: "${email}",
+    school: "Babu Banarasi Das National Institute Of Technology And Management"
+  });
+})();`;
+
+      // Copy script trực tiếp vào clipboard
+      navigator.clipboard.writeText(jsScript).then(() => {
+        const btn = document.getElementById('scriptBtn');
+        if (btn) {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✅ Script Copied!';
+          btn.style.background = '#dc3545';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '#28a745';
+          }, 2000);
+        }
+      }).catch(err => {
+        alert('Failed to copy script: ' + err);
+      });
+    }
+  </script>
+</body>
+</html>
