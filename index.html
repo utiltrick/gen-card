@@ -146,6 +146,12 @@
     .actions .random-btn:hover {
       background-color: #138496;
     }
+    .actions .prompt-btn {
+      background-color: #6f42c1;
+    }
+    .actions .prompt-btn:hover {
+      background-color: #5a32a3;
+    }
     .script-section {
       margin: 10px;
       padding: 15px;
@@ -166,9 +172,8 @@
 <body>
   <div class="actions">
     <input type="file" accept="image/*" onchange="uploadAvatar(event)">
-<!--     <button onclick="randomAvatar()">Random Avatar</button>
-    <button onclick="loadThisPerson()">From thispersondoesnotexist.com</button> -->
     <button class="random-btn" onclick="randomizeInfo()">🎲 Random Info</button>
+    <button class="prompt-btn" onclick="copyPrompt()">📝 Copy AI Prompt</button>
     <button onclick="downloadCard()">Download as Image</button>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
   </div>
@@ -231,25 +236,105 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    // Dữ liệu để random
-    const firstNames = [
+    // AI Prompt cho ID photo
+    const AI_PROMPT = "Professional ID photo of a young Indian male student against a plain blue background, 3x4 aspect ratio, passport style photo, clean shaven or light facial hair, formal attire like shirt or polo, neutral expression, direct eye contact with camera, soft natural lighting, slightly soft focus for realistic ID card quality, professional photography style, clean and simple composition";
+
+    const courses = [
+      'B. Tech / CS', 'B. Tech / IT', 'B. Tech / ECE', 'B. Tech / ME', 'B. Tech / CE',
+      'B. Tech / EE', 'BCA', 'MCA', 'MBA', 'BBA', 'B. Tech / AI&ML', 'B. Tech / DS',
+      'B.Sc / Physics', 'B.Sc / Chemistry', 'B.Sc / Mathematics', 'B.Com', 'BBA'
+    ];
+
+    // Cache để lưu tên đã random
+    let nameCache = [];
+    let usedNames = new Set();
+
+    // Fallback names nếu API không khả dụng
+    const fallbackFirstNames = [
       'RAHUL', 'PRIYA', 'AMIT', 'SNEHA', 'VIKASH', 'POOJA', 'RAVI', 'DEEPIKA',
       'AJAY', 'KAVYA', 'SANJAY', 'NISHA', 'ROHIT', 'SWATI', 'ANKIT', 'MEERA',
       'SUNIL', 'ANJALI', 'MANOJ', 'REKHA', 'VISHAL', 'SUNITA', 'ASHOK', 'SEEMA'
     ];
 
-    const lastNames = [
+    const fallbackLastNames = [
       'SHARMA', 'VERMA', 'GUPTA', 'SINGH', 'KUMAR', 'YADAV', 'MISHRA', 'TIWARI',
       'AGARWAL', 'JAIN', 'PANDEY', 'SRIVASTAVA', 'TRIPATHI', 'CHAUDHARY', 'BANSAL', 'CHOPRA'
     ];
 
-    const courses = [
-      'B. Tech / CS', 'B. Tech / IT', 'B. Tech / ECE', 'B. Tech / ME', 'B. Tech / CE',
-      'B. Tech / EE', 'BCA', 'MCA', 'MBA', 'BBA'
-    ];
-
     function randomChoice(array) {
       return array[Math.floor(Math.random() * array.length)];
+    }
+
+    // Hàm lấy tên từ API
+    async function fetchRandomName() {
+      try {
+        // Sử dụng randomuser.me API cho tên thực tế
+        const response = await fetch('https://randomuser.me/api/?nat=in&inc=name');
+        const data = await response.json();
+        
+        if (data.results && data.results[0]) {
+          const user = data.results[0];
+          const firstName = user.name.first.toUpperCase();
+          const lastName = user.name.last.toUpperCase();
+          return { firstName, lastName };
+        }
+      } catch (error) {
+        console.log('API not available, using fallback names');
+      }
+      
+      // Fallback nếu API không khả dụng
+      return {
+        firstName: randomChoice(fallbackFirstNames),
+        lastName: randomChoice(fallbackLastNames)
+      };
+    }
+
+    // Preload một số tên để sử dụng nhanh
+    async function preloadNames() {
+      for (let i = 0; i < 5; i++) {
+        try {
+          const name = await fetchRandomName();
+          nameCache.push(name);
+          await new Promise(resolve => setTimeout(resolve, 100)); // Throttle requests
+        } catch (error) {
+          break;
+        }
+      }
+    }
+
+    // Hàm lấy tên unique
+    async function getUniqueNameCombination() {
+      let name;
+      let attempts = 0;
+      
+      do {
+        // Thử lấy từ cache trước
+        if (nameCache.length > 0) {
+          name = nameCache.pop();
+        } else {
+          name = await fetchRandomName();
+        }
+        
+        const combination = `${name.firstName}_${name.lastName}`;
+        
+        if (!usedNames.has(combination)) {
+          usedNames.add(combination);
+          
+          // Preload thêm tên vào cache nếu cache ít
+          if (nameCache.length < 2) {
+            fetchRandomName().then(newName => nameCache.push(newName)).catch(() => {});
+          }
+          
+          return name;
+        }
+        
+        attempts++;
+        if (attempts > 10) {
+          // Reset nếu quá nhiều lần thử
+          usedNames.clear();
+          return name;
+        }
+      } while (true);
     }
 
     function generateRandomPhone() {
@@ -270,33 +355,43 @@
       return `${startYear} - ${startYear + 4}`;
     }
 
-    function randomizeInfo() {
-      const firstName = randomChoice(firstNames);
-      const lastName = randomChoice(lastNames);
-      const fullName = `${firstName} ${lastName}`;
-      const course = randomChoice(courses);
-      const fatherName = `${randomChoice(firstNames)} ${lastName}`;
-      const mobile = generateRandomPhone();
-      const session = generateSession();
-      const regNo = generateRegNo();
+    async function randomizeInfo() {
+      // Show loading state
+      const randomBtn = document.querySelector('.random-btn');
+      const originalText = randomBtn.innerHTML;
+      randomBtn.innerHTML = '⏳ Loading...';
+      randomBtn.disabled = true;
 
-      // Cập nhật giao diện
-      document.getElementById('student-name').textContent = fullName;
-      document.getElementById('course').textContent = course;
-      document.getElementById('father-name').textContent = fatherName;
-      document.getElementById('mobile').textContent = mobile;
-      document.getElementById('session').textContent = session;
-      document.getElementById('regno').textContent = regNo;
+      try {
+        const { firstName, lastName } = await getUniqueNameCombination();
+        const fullName = `${firstName} ${lastName}`;
+        const course = randomChoice(courses);
+        const fatherName = `${randomChoice(fallbackFirstNames)} ${lastName}`;
+        const mobile = generateRandomPhone();
+        const session = generateSession();
+        const regNo = generateRegNo();
 
-      // Cập nhật barcode
-      const encodedRegNo = encodeURIComponent(regNo);
-      document.getElementById('barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${encodedRegNo}&code=Code128&translate-esc=false`;
+        // Cập nhật giao diện
+        document.getElementById('student-name').textContent = fullName;
+        document.getElementById('course').textContent = course;
+        document.getElementById('father-name').textContent = fatherName;
+        document.getElementById('mobile').textContent = mobile;
+        document.getElementById('session').textContent = session;
+        document.getElementById('regno').textContent = regNo;
 
-      // Random avatar cũng
-      randomAvatar();
+        // Cập nhật barcode
+        const encodedRegNo = encodeURIComponent(regNo);
+        document.getElementById('barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${encodedRegNo}&code=Code128&translate-esc=false`;
 
-      // Nếu script đã được tạo thì tự động tạo lại
-      // (không cần thiết nữa vì không còn hiển thị script)
+        // Random avatar cũng
+        randomAvatar();
+      } catch (error) {
+        console.error('Error randomizing info:', error);
+      } finally {
+        // Restore button state
+        randomBtn.innerHTML = originalText;
+        randomBtn.disabled = false;
+      }
     }
 
     function randomAvatar() {
@@ -314,6 +409,25 @@
         document.getElementById("avatar").src = e.target.result;
       };
       reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function copyPrompt() {
+      navigator.clipboard.writeText(AI_PROMPT).then(() => {
+        // Tạo thông báo tạm thời
+        const originalButton = event.target;
+        const originalText = originalButton.innerHTML;
+        const originalBg = originalButton.style.backgroundColor;
+        
+        originalButton.innerHTML = '✅ Prompt Copied!';
+        originalButton.style.backgroundColor = '#28a745';
+        
+        setTimeout(() => {
+          originalButton.innerHTML = originalText;
+          originalButton.style.backgroundColor = originalBg;
+        }, 2000);
+      }).catch(err => {
+        alert('Failed to copy prompt: ' + err);
+      });
     }
 
     function downloadCard() {
@@ -418,6 +532,11 @@
         alert('Failed to copy script: ' + err);
       });
     }
+
+    // Preload names khi trang load
+    document.addEventListener('DOMContentLoaded', () => {
+      preloadNames();
+    });
   </script>
 </body>
 </html>
