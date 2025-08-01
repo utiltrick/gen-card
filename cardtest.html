@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Tạo Thẻ Sinh Viên - Giống Mẫu Nhất</title>
+    <style>
+        /* --- Google Fonts & Global Styles --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --card-blue: #005a9e;
+            --text-dark-grey: #333333;
+            --text-black: #000000;
+            --border-light-grey: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        /* --- Card Wrapper --- */
+        .card-wrapper {
+            width: 520px;
+            max-width: 100%;
+        }
+
+        /* --- ID Card Structure --- */
+        .id-card {
+            background-color: var(--card-blue);
+            border-radius: 16px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            color: white;
+            padding: 2px; /* Creates the inset border effect */
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .institute-details {
+            line-height: 1.25;
+        }
+
+        .institute-details h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .institute-details p {
+            font-size: 10.5px;
+            font-weight: 400;
+            margin: 3px 0 0;
+            opacity: 0.95;
+        }
+
+        .card-body {
+            background-color: white;
+            border-radius: 0 0 14px 14px;
+            padding: 15px;
+            color: var(--text-dark-grey);
+            position: relative;
+            overflow: hidden; /* Important for watermark */
+        }
+
+        .card-content {
+            display: flex;
+            position: relative;
+            z-index: 2; /* Content on top of watermark */
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 52%;
+            left: 68%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            opacity: 0.08;
+            z-index: 1;
+            background-image: url('https://i.ibb.co/dStpJfP/image.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .profile-pic-container {
+            width: 110px;
+            height: 130px;
+            border: 1px solid var(--border-light-grey);
+            flex-shrink: 0;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-details {
+            flex-grow: 1;
+            padding-left: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-item {
+            font-size: 13px;
+            margin-bottom: 11px;
+            line-height: 1.4;
+        }
+        
+        .detail-item strong {
+            font-weight: 500;
+            color: var(--text-dark-grey);
+            margin-right: 4px;
+        }
+
+        .editable {
+            font-weight: 700;
+            color: var(--text-black);
+            outline: none;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s ease;
+            display: inline-block;
+        }
+
+        .editable:focus {
+            background-color: #e0f2ff;
+        }
+
+        .detail-item.class {
+            font-size: 14px; /* Class text is slightly larger */
+        }
+
+        .card-footer {
+            margin-top: auto; /* Pushes footer to the bottom */
+            padding-top: 5px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .barcode-container {
+            width: 200px;
+            height: 35px;
+        }
+        
+        .barcode {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        .principal {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-dark-grey);
+        }
+
+        /* --- Controls & Hidden Inputs --- */
+        .controls {
+            margin-top: 25px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: var(--card-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background-color: #00487e;
+            transform: translateY(-2px);
+        }
+
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-wrapper">
+        <div class="id-card">
+            <div class="card-header">
+                <div class="logo-container" id="logoUploader">
+                    <img src="https://i.ibb.co/dStpJfP/image.png" alt="Logo" class="logo" id="logoImg">
+                </div>
+                <div class="institute-details">
+                    <h1>Narnarayan Shastri Institute of Technology</h1>
+                    <p>Gurukul Campus, At - Jetalpur, Ahmedabad-382426</p>
+                    <p>Mo : 9825833001, Email : nsitgurukul@yahoo.com</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="watermark" id="watermarkImg"></div>
+                <div class="card-content">
+                    <div class="profile-pic-container" id="profilePicUploader" title="Nhấp để tải ảnh hoặc Dán (Paste) ảnh">
+                        <img src="https://i.ibb.co/dStpJfP/image.png" alt="Profile Picture" class="profile-pic" id="profilePicImg">
+                    </div>
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <strong>Name :</strong><span id="cardName" class="editable" contenteditable="true">Rohan Mehta</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Enroll No :</strong><span id="cardEnroll" class="editable" contenteditable="true">180340119009</span>
+                        </div>
+                        <div class="detail-item class">
+                            <strong>Class :</strong><span id="cardClass" class="editable" contenteditable="true">MECHANICAL ENGINEERING</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Valid upto :</strong><span id="cardValid" class="editable" contenteditable="true">30/06/2028</span>
+                        </div>
+                        <div class="card-footer">
+                            <div class="barcode-container">
+                                <img id="barcodeImg" class="barcode" alt="Barcode">
+                            </div>
+                            <span class="principal">Principal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="randomizeBtn" class="control-btn">🎲 Tạo Dữ Liệu Ngẫu Nhiên</button>
+    </div>
+
+    <input type="file" id="logoInput" class="file-input" accept="image/*">
+    <input type="file" id="profilePicInput" class="file-input" accept="image/*">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardEnroll = document.getElementById('cardEnroll');
+            const barcodeImg = document.getElementById('barcodeImg');
+            const logoUploader = document.getElementById('logoUploader');
+            const logoInput = document.getElementById('logoInput');
+            const logoImg = document.getElementById('logoImg');
+            const watermarkImg = document.getElementById('watermarkImg');
+            const profilePicUploader = document.getElementById('profilePicUploader');
+            const profilePicInput = document.getElementById('profilePicInput');
+            const profilePicImg = document.getElementById('profilePicImg');
+            const randomizeBtn = document.getElementById('randomizeBtn');
+
+            const generateBarcode = () => {
+                const data = cardEnroll.textContent.trim();
+                if (data) {
+                    barcodeImg.src = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(data)}&code=Code128&dpi=96`;
+                    barcodeImg.alt = `Mã vạch của ${data}`;
+                } else {
+                    barcodeImg.src = '';
+                    barcodeImg.alt = 'Không có dữ liệu';
+                }
+            };
+            
+            cardEnroll.addEventListener('blur', generateBarcode);
+
+            const setupImageUploader = (trigger, input, imgElement, watermarkElement = null) => {
+                trigger.addEventListener('click', () => input.click());
+                input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            imgElement.src = e.target.result;
+                            if (watermarkElement) {
+                                watermarkElement.style.backgroundImage = `url('${e.target.result}')`;
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            };
+            
+            setupImageUploader(logoUploader, logoInput, logoImg, watermarkImg);
+            setupImageUploader(profilePicUploader, profilePicInput, profilePicImg);
+
+            profilePicUploader.addEventListener('paste', (event) => {
+                event.preventDefault();
+                const items = (event.clipboardData || window.clipboardData).items;
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        const file = item.getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = (e) => { profilePicImg.src = e.target.result; };
+                        reader.readAsDataURL(file);
+                        break;
+                    }
+                }
+            });
+
+            const randomizeData = () => {
+                const names = ["Anjali Verma", "Vikram Singh", "Priya Patel", "Arjun Reddy", "Sneha Sharma", "Rahul Kumar"];
+                const classes = ["COMPUTER SCIENCE", "CIVIL ENGINEERING", "MECHANICAL ENGINEERING", "ELECTRONICS & COM."];
+                
+                document.getElementById('cardName').textContent = names[Math.floor(Math.random() * names.length)];
+                document.getElementById('cardClass').textContent = classes[Math.floor(Math.random() * classes.length)];
+                
+                cardEnroll.textContent = '1803401' + Math.floor(10000 + Math.random() * 90000);
+
+                const year = new Date().getFullYear() + 4;
+                const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+                const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+                document.getElementById('cardValid').textContent = `${day}/${month}/${year}`;
+                
+                generateBarcode();
+            };
+
+            randomizeBtn.addEventListener('click', randomizeData);
+            generateBarcode();
+        });
+    </script>
+</body>
+</html>
