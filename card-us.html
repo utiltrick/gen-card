@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US College Student ID Card Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+        }
+
+        .paste-area {
+            border: 2px dashed #BDC3C7;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            background: #F8F9FA;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #7F8C8D;
+        }
+
+        .paste-area:hover {
+            border-color: #3498DB;
+            background: #EBF3FD;
+        }
+
+        .paste-area.dragover {
+            border-color: #2ECC71;
+            background: #E8F8F5;
+        }
+
+        .student-card {
+            width: 550px;
+            height: 340px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 18px;
+            padding: 25px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            color: white;
+        }
+
+        /* US College styling decorations */
+        .card-bg::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .card-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .shape-1 {
+            position: absolute;
+            top: 20px;
+            left: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            transform: rotate(45deg);
+            z-index: 1;
+        }
+
+        .shape-2 {
+            position: absolute;
+            bottom: 20px;
+            right: -20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .university-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .university-logo {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 8px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .university-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .university-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .card-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            line-height: 0.9;
+            margin-bottom: 20px;
+            z-index: 10;
+            position: relative;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .student-info {
+            z-index: 10;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .info-label {
+            width: 80px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .info-colon {
+            margin: 0 8px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: white;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .student-photo {
+            position: absolute;
+            top: 60px;
+            right: 35px;
+            width: 150px;
+            height: 200px;
+            border-radius: 12px;
+            border: 4px solid rgba(255,255,255,0.9);
+            background: #BDC3C7;
+            z-index: 10;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #7F8C8D;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .student-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .barcode {
+            position: absolute;
+            bottom: 12px;
+            right: 35px;
+            z-index: 10;
+        }
+
+        .barcode img {
+            height: 28px;
+            width: 180px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .loading {
+            color: rgba(255,255,255,0.8);
+            font-size: 11px;
+        }
+
+        .photo-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .valid-thru {
+            position: absolute;
+            bottom: 12px;
+            left: 25px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <button class="btn" onclick="randomizeInfo()">Generate Random Student</button>
+            <button class="btn btn-warning" onclick="copyScript()">Copy Auto-Fill Script</button>
+            <div class="photo-controls">
+                <label for="photoUpload" class="file-label">Upload Photo</label>
+                <input type="file" id="photoUpload" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
+                <button class="btn btn-success" onclick="downloadCard()">Download ID Card</button>
+            </div>
+        </div>
+
+        <div class="paste-area" id="pasteArea" onclick="document.getElementById('photoUpload').click()">
+            Click to select photo or paste from clipboard (Ctrl+V)
+        </div>
+
+        <div class="student-card card-bg" id="studentCard">
+            <div class="shape-1"></div>
+            <div class="shape-2"></div>
+            
+            <div class="university-header">
+                <div class="university-logo">
+                    <img src="https://i.ibb.co/rGD4zcCW/image.png" alt="Harvard Logo" id="universityLogo">
+                </div>
+                <div class="university-name">Harvard University</div>
+            </div>
+
+            <div class="card-title">
+                STUDENT ID
+            </div>
+
+            <div class="student-info">
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-colon">:</span>
+                    <span class="info-value" id="studentName">Michael Johnson</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ID</span>
+                    <span class="info-colon">:</span>
+                    <span class="info-value" id="studentId">H24567890</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">DOB</span>
+                    <span class="info-colon">:</span>
+                    <span class="info-value" id="studentDob">03/15/2005</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Major</span>
+                    <span class="info-colon">:</span>
+                    <span class="info-value" id="studentMajor">Computer Science</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Year</span>
+                    <span class="info-colon">:</span>
+                    <span class="info-value" id="studentYear">Sophomore</span>
+                </div>
+            </div>
+
+            <div class="student-photo" id="studentPhoto">
+                Student Photo
+            </div>
+
+            <div class="valid-thru">
+                Valid thru: <span id="validThru">05/2028</span>
+            </div>
+
+            <div class="barcode" id="barcodeContainer">
+                <div class="loading">Generating barcode...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // US College data
+        const firstNames = [
+            'Michael', 'Sarah', 'David', 'Jessica', 'Christopher', 'Ashley', 'Matthew', 'Amanda',
+            'Joshua', 'Jennifer', 'Andrew', 'Brittany', 'Daniel', 'Samantha', 'James', 'Emily',
+            'Justin', 'Rachel', 'Ryan', 'Megan', 'John', 'Lauren', 'Zachary', 'Hannah',
+            'Nicholas', 'Stephanie', 'Tyler', 'Kayla', 'Brandon', 'Nicole'
+        ];
+
+        const lastNames = [
+            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+            'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
+            'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson',
+            'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson'
+        ];
+
+        const universities = [
+            {
+                name: 'Harvard University',
+                logo: 'https://i.ibb.co/rGD4zcCW/image.png',
+                code: 'H',
+                fullName: 'Harvard University',
+                emailDomain: 'harvard.edu'
+            },
+            {
+                name: 'Stanford University', 
+                logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Stanford_Cardinal_logo.svg/1200px-Stanford_Cardinal_logo.svg.png',
+                code: 'S',
+                fullName: 'Stanford University',
+                emailDomain: 'stanford.edu'
+            }
+        ];
+
+        const majors = [
+            'Computer Science', 'Business Administration', 'Psychology', 'Biology', 'Engineering',
+            'English Literature', 'Economics', 'Political Science', 'Mathematics', 'Chemistry',
+            'Physics', 'History', 'Art History', 'Philosophy', 'Sociology', 'Communications',
+            'Pre-Med', 'Pre-Law', 'International Relations', 'Environmental Science',
+            'Marketing', 'Finance', 'Accounting', 'Journalism', 'Theater Arts'
+        ];
+
+        const yearLevels = [
+            { level: 'Freshman', year: 1 },
+            { level: 'Sophomore', year: 2 },
+            { level: 'Junior', year: 3 },
+            { level: 'Senior', year: 4 }
+        ];
+
+        let currentSchoolIndex = 0;
+
+        // Store current student data globally
+        let currentStudentData = {
+            firstName: '',
+            lastName: '',
+            day: '',
+            month: '',
+            year: '',
+            email: '',
+            university: ''
+        };
+
+        function randomizeInfo() {
+            // Show loading state
+            document.getElementById('studentName').textContent = 'Loading...';
+            document.getElementById('studentId').textContent = 'Loading...';
+            document.getElementById('studentDob').textContent = 'Loading...';
+            
+            // Fetch random user from API
+            fetch('https://randomuser.me/api/?nat=us')
+                .then(response => response.json())
+                .then(data => {
+                    const user = data.results[0];
+                    
+                    // Random university
+                    currentSchoolIndex = Math.floor(Math.random() * universities.length);
+                    const university = universities[currentSchoolIndex];
+                    document.querySelector('.university-name').textContent = university.name;
+                    document.getElementById('universityLogo').src = university.logo;
+                    document.getElementById('universityLogo').alt = `${university.name} Logo`;
+                    
+                    // Use API name
+                    const fullName = `${user.name.first} ${user.name.last}`;
+                    
+                    // Random Student ID (US format)
+                    const universityCode = university.code;
+                    const idNumber = Math.floor(Math.random() * 90000000) + 10000000; // 8 digit number
+                    const studentId = `${universityCode}${idNumber}`;
+                    
+                    // Random DOB (2004-2007 only)
+                    const birthYear = Math.floor(Math.random() * 4) + 2004; // 2004-2007
+                    const month = Math.floor(Math.random() * 12) + 1;
+                    const day = Math.floor(Math.random() * 28) + 1;
+                    const dob = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${birthYear}`;
+                    
+                    // Random major and year
+                    const major = majors[Math.floor(Math.random() * majors.length)];
+                    const yearObj = yearLevels[Math.floor(Math.random() * yearLevels.length)];
+                    
+                    // Calculate valid through date and academic year
+                    const currentYear = new Date().getFullYear();
+                    const entryYear = currentYear - (yearObj.year - 1);
+                    const graduationYear = entryYear + 4;
+                    const validThru = `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}/${graduationYear}`;
+                    const academicYear = `${entryYear}-${graduationYear}`;
+                    
+                    // Generate email
+                    const emailUsername = `${user.name.first.toLowerCase()}.${user.name.last.toLowerCase()}${Math.floor(Math.random() * 99) + 1}`;
+                    const email = `${emailUsername}@${university.emailDomain}`;
+                    
+                    // Store data for script generation
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                   'July', 'August', 'September', 'October', 'November', 'December'];
+                    currentStudentData = {
+                        firstName: user.name.first,
+                        lastName: user.name.last,
+                        day: day,
+                        month: months[month - 1],
+                        year: birthYear,
+                        email: email,
+                        university: university.fullName
+                    };
+                    
+                    // Update card
+                    document.getElementById('studentName').textContent = fullName;
+                    document.getElementById('studentId').textContent = studentId;
+                    document.getElementById('studentDob').textContent = dob;
+                    document.getElementById('studentMajor').textContent = major;
+                    document.getElementById('studentYear').textContent = `${yearObj.level} (${academicYear})`;
+                    document.getElementById('validThru').textContent = validThru;
+                    
+                    // Use API photo instead of random avatar
+                    const photoContainer = document.getElementById('studentPhoto');
+                    photoContainer.innerHTML = `<img src="${user.picture.large}" alt="Student Photo">`;
+                    
+                    // Auto-generate barcode with new info
+                    setTimeout(() => {
+                        generateBarcodeFromInfo();
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('Error fetching random user:', error);
+                    // Fallback to local random generation
+                    fallbackRandomGeneration();
+                });
+        }
+
+        function fallbackRandomGeneration() {
+            // Random university
+            currentSchoolIndex = Math.floor(Math.random() * universities.length);
+            const university = universities[currentSchoolIndex];
+            document.querySelector('.university-name').textContent = university.name;
+            document.getElementById('universityLogo').src = university.logo;
+            document.getElementById('universityLogo').alt = `${university.name} Logo`;
+            
+            // Random name from local arrays
+            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const fullName = `${firstName} ${lastName}`;
+            
+            // Random Student ID (US format)
+            const universityCode = university.code;
+            const idNumber = Math.floor(Math.random() * 90000000) + 10000000;
+            const studentId = `${universityCode}${idNumber}`;
+            
+            // Random DOB (2004-2007 only)
+            const birthYear = Math.floor(Math.random() * 4) + 2004;
+            const month = Math.floor(Math.random() * 12) + 1;
+            const day = Math.floor(Math.random() * 28) + 1;
+            const dob = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${birthYear}`;
+            
+            // Random major and year
+            const major = majors[Math.floor(Math.random() * majors.length)];
+            const yearObj = yearLevels[Math.floor(Math.random() * yearLevels.length)];
+            
+            // Calculate valid through date and academic year
+            const currentYear = new Date().getFullYear();
+            const entryYear = currentYear - (yearObj.year - 1);
+            const graduationYear = entryYear + 4;
+            const validThru = `${(Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0')}/${graduationYear}`;
+            const academicYear = `${entryYear}-${graduationYear}`;
+            
+            // Generate email
+            const emailUsername = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 99) + 1}`;
+            const email = `${emailUsername}@${university.emailDomain}`;
+            
+            // Store data for script generation
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            currentStudentData = {
+                firstName: firstName,
+                lastName: lastName,
+                day: day,
+                month: months[month - 1],
+                year: birthYear,
+                email: email,
+                university: university.fullName
+            };
+            
+            // Update card
+            document.getElementById('studentName').textContent = fullName;
+            document.getElementById('studentId').textContent = studentId;
+            document.getElementById('studentDob').textContent = dob;
+            document.getElementById('studentMajor').textContent = major;
+            document.getElementById('studentYear').textContent = `${yearObj.level} (${academicYear})`;
+            document.getElementById('validThru').textContent = validThru;
+            
+            // Generate random avatar as fallback
+            generateRandomAvatar();
+            
+            // Auto-generate barcode
+            setTimeout(() => {
+                generateBarcodeFromInfo();
+            }, 500);
+        }
+
+        function generateRandomAvatar() {
+            const photoContainer = document.getElementById('studentPhoto');
+            const seed = Math.random().toString(36).substring(7);
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+            
+            photoContainer.innerHTML = `<img src="${avatarUrl}" alt="Student Photo">`;
+        }
+
+        function generateBarcodeFromInfo() {
+            const studentId = document.getElementById('studentId').textContent;
+            const barcodeContainer = document.getElementById('barcodeContainer');
+            
+            // Show loading immediately
+            barcodeContainer.innerHTML = '<div class="loading">Generating barcode...</div>';
+            
+            // Use a simpler barcode data format
+            const barcodeData = studentId;
+            
+            // Try multiple barcode services
+            const barcodeServices = [
+                `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(barcodeData)}&scale=2&height=8&includetext=false`,
+                `https://barcode.orcascan.com/?type=code128&data=${encodeURIComponent(barcodeData)}&format=png&width=2&height=50`,
+                `https://api.qrserver.com/v1/create-qr-code/?size=180x28&data=${encodeURIComponent(barcodeData)}&format=png`
+            ];
+            
+            let currentServiceIndex = 0;
+            
+            function tryNextService() {
+                if (currentServiceIndex >= barcodeServices.length) {
+                    // All services failed, show fallback
+                    barcodeContainer.innerHTML = `
+                        <div style="background: white; height: 28px; width: 180px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: black; border-radius: 2px; font-family: monospace;">
+                            *${barcodeData}*
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const img = new Image();
+                const currentUrl = barcodeServices[currentServiceIndex];
+                
+                img.onload = function() {
+                    barcodeContainer.innerHTML = `<img src="${currentUrl}" alt="Barcode" style="height: 28px; max-width: 180px;">`;
+                };
+                
+                img.onerror = function() {
+                    currentServiceIndex++;
+                    setTimeout(tryNextService, 500);
+                };
+                
+                // Set a timeout for the image load
+                setTimeout(() => {
+                    if (!img.complete) {
+                        img.onerror();
+                    }
+                }, 3000);
+                
+                img.src = currentUrl;
+            }
+            
+            // Start trying services after a short delay
+            setTimeout(tryNextService, 300);
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                displayImage(file);
+            }
+        }
+
+        function displayImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoContainer = document.getElementById('studentPhoto');
+                photoContainer.innerHTML = `<img src="${e.target.result}" alt="Student Photo">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function downloadCard() {
+            const card = document.getElementById('studentCard');
+            html2canvas(card, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `student-id-${document.getElementById('studentId').textContent}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        // Handle paste image
+        document.addEventListener('paste', function(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    displayImage(blob);
+                    break;
+                }
+            }
+        });
+
+        // Handle drag & drop
+        const pasteArea = document.getElementById('pasteArea');
+        pasteArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            pasteArea.classList.add('dragover');
+        });
+
+        pasteArea.addEventListener('dragleave', function(e) {
+            pasteArea.classList.remove('dragover');
+        });
+
+        pasteArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            pasteArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    displayImage(file);
+                }
+            }
+        });
+
+        function copyScript() {
+            if (!currentStudentData.firstName) {
+                alert('Please generate a random student first!');
+                return;
+            }
+            
+            const jsScript = `(async () => {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const set = async (sel, val) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const setVal = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+    setVal.call(el, val);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new Event("blur", { bubbles: true }));
+    await delay(150);
+  };
+  const pasteSchool = async (val) => {
+    const el = document.querySelector('#sid-college-name');
+    if (!el) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, val);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    await delay(2000);
+    document.querySelector('#sid-college-name-menu [role="option"]')?.click();
+  };
+  const selectMonth = async () => {
+    const el = document.querySelector('#sid-birthdate__month');
+    if (!el) return;
+    el.focus(); el.click();
+    await delay(400);
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await delay(400);
+    [...document.querySelectorAll('#sid-birthdate__month-menu [role="option"]')]
+      .find(o => o.innerText.toLowerCase().startsWith("${currentStudentData.month.toLowerCase()}"))?.click();
+  };
+  await pasteSchool("${currentStudentData.university}");
+  await selectMonth();
+  const fields = [
+    ['#sid-first-name', '${currentStudentData.firstName}'],
+    ['#sid-last-name', '${currentStudentData.lastName}'],
+    ['#sid-birthdate-day', '${String(currentStudentData.day).padStart(2, '0')}'],
+    ['#sid-birthdate-year', '${currentStudentData.year}'],
+    ['#sid-email', '${currentStudentData.email}']
+  ];
+  for (const [sel, val] of fields) await set(sel, val);
+  for (const [sel, val] of fields) if (!document.querySelector(sel)?.value) await set(sel, val);
+  console.log("✅ Form đã được điền đầy đủ (chưa submit)");
+  console.log("📋 Thông tin đã điền:", {
+    name: "${currentStudentData.firstName} ${currentStudentData.lastName}",
+    birthdate: "${String(currentStudentData.day).padStart(2, '0')}/${currentStudentData.month}/${currentStudentData.year}",
+    email: "${currentStudentData.email}",
+    school: "${currentStudentData.university}"
+  });
+})();`;
+            
+            navigator.clipboard.writeText(jsScript).then(() => {
+                alert('✅ Auto-fill script copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy script:', err);
+                alert('❌ Failed to copy script. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
