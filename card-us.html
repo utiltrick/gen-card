@@ -82,6 +82,13 @@
             display: flex;
             justify-content: center;
             margin-bottom: 30px;
+            perspective: 1200px;
+        }
+
+        .card-3d-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
         }
 
         .student-card {
@@ -89,7 +96,10 @@
             height: 540px;
             position: relative;
             border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.2);
             overflow: hidden;
             border: 1px solid #ddd;
             background:
@@ -106,7 +116,6 @@
             right: 0;
             bottom: 0;
             background: url(https://i.ibb.co/5gYCY3w5/image.png);
-            ;
         }
 
         /* Santa Fe College Logo (đã có tên trường) */
@@ -373,15 +382,25 @@
             line-height: 1.5;
         }
 
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .student-card {
+            animation: float 6s ease-in-out infinite;
+        }
+
         @media (max-width: 900px) {
-            .student-card {
+            .card-3d-wrapper {
                 transform: scale(0.7);
                 transform-origin: center;
             }
         }
 
         @media (max-width: 600px) {
-            .student-card {
+            .card-3d-wrapper {
                 transform: scale(0.5);
                 transform-origin: center;
             }
@@ -404,82 +423,84 @@
         </div>
 
         <div class="card-container">
-            <div class="student-card" id="studentCard">
-                <div class="card-overlay"></div>
+            <div class="card-3d-wrapper">
+                <div class="student-card" id="studentCard">
+                    <div class="card-overlay"></div>
 
-                <!-- Santa Fe College Logo (đã bao gồm tên trường) -->
-                <div class="college-logo"></div>
+                    <!-- Santa Fe College Logo (đã bao gồm tên trường) -->
+                    <div class="college-logo"></div>
 
-                <!-- Card Header -->
-                <div class="card-header">
-                    <div class="title">STUDENT IDENTIFICATION</div>
-                    <div class="subtitle">COLLEGE ID CARD</div>
-                </div>
-
-                <!-- Main Student Name -->
-                <div class="student-name-main">
-                    <input type="text" class="editable" id="studentNameMain" placeholder="Student Name"
-                        value="Courtney Hogan" style="width: 100%;">
-                </div>
-
-                <!-- Small Photo and Name -->
-                <div class="small-photo-section" onclick="document.getElementById('photoInput').click()">
-                    <img id="smallPhoto" class="small-photo" style="display: none;">
-                    <div id="smallPhotoPlaceholder" class="small-photo-placeholder">Click for<br>photo</div>
-                    <div class="small-name-text">
-                        <input type="text" class="editable" id="smallNameText" placeholder="Last Name" value="Hogan"
-                            style="width: 90px; text-align: center;">
+                    <!-- Card Header -->
+                    <div class="card-header">
+                        <div class="title">STUDENT IDENTIFICATION</div>
+                        <div class="subtitle">COLLEGE ID CARD</div>
                     </div>
-                </div>
 
-                <!-- SFID Section -->
-                <div class="sfid-section">
-                    <div class="sfid-text">
-                        SFID: <input type="text" class="editable" id="studentId" placeholder="0000-0000"
-                            value="0801-7915" style="width: 120px;">
+                    <!-- Main Student Name -->
+                    <div class="student-name-main">
+                        <input type="text" class="editable" id="studentNameMain" placeholder="Student Name"
+                            value="Courtney Hogan" style="width: 100%;">
                     </div>
-                </div>
 
-                <!-- Student Information -->
-                <div class="student-info">
-                    <div class="info-row">
-                        <div class="info-label">Date of Birth</div>
-                        <div class="info-value">
-                            <input type="text" class="editable" id="birthDate" placeholder="MM-DD-YYYY"
-                                value="02-08-2005" style="width: 100px;">
+                    <!-- Small Photo and Name -->
+                    <div class="small-photo-section" onclick="document.getElementById('photoInput').click()">
+                        <img id="smallPhoto" class="small-photo" style="display: none;">
+                        <div id="smallPhotoPlaceholder" class="small-photo-placeholder">Click for<br>photo</div>
+                        <div class="small-name-text">
+                            <input type="text" class="editable" id="smallNameText" placeholder="Last Name" value="Hogan"
+                                style="width: 90px; text-align: center;">
                         </div>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">Date Issued</div>
-                        <div class="info-value">
-                            <input type="text" class="editable" id="issueDate" placeholder="MM-DD-YYYY"
-                                value="08-18-2025" style="width: 100px;">
+
+                    <!-- SFID Section -->
+                    <div class="sfid-section">
+                        <div class="sfid-text">
+                            SFID: <input type="text" class="editable" id="studentId" placeholder="0000-0000"
+                                value="0801-7915" style="width: 120px;">
                         </div>
                     </div>
-                </div>
 
-                <!-- Signature Section -->
-                <div class="signature-section">
-                    <div class="signature-line">
-                        <div class="signature-text" id="signatureDisplay">Ethan</div>
+                    <!-- Student Information -->
+                    <div class="student-info">
+                        <div class="info-row">
+                            <div class="info-label">Date of Birth</div>
+                            <div class="info-value">
+                                <input type="text" class="editable" id="birthDate" placeholder="MM-DD-YYYY"
+                                    value="02-08-2005" style="width: 100px;">
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Date Issued</div>
+                            <div class="info-value">
+                                <input type="text" class="editable" id="issueDate" placeholder="MM-DD-YYYY"
+                                    value="08-18-2025" style="width: 100px;">
+                            </div>
+                        </div>
                     </div>
-                    <div class="signature-label">Signature</div>
-                </div>
 
-                <!-- Large Student Photo -->
-                <div class="large-photo-section" onclick="document.getElementById('photoInput').click()">
-                    <img id="largePhoto" class="large-photo" style="display: none;">
-                    <div id="largePhotoPlaceholder" class="large-photo-placeholder">Click to upload<br>student photo
+                    <!-- Signature Section -->
+                    <div class="signature-section">
+                        <div class="signature-line">
+                            <div class="signature-text" id="signatureDisplay">Ethan</div>
+                        </div>
+                        <div class="signature-label">Signature</div>
                     </div>
-                </div>
 
-                <!-- Student Badge -->
-                <div class="student-badge">STUDENT</div>
+                    <!-- Large Student Photo -->
+                    <div class="large-photo-section" onclick="document.getElementById('photoInput').click()">
+                        <img id="largePhoto" class="large-photo" style="display: none;">
+                        <div id="largePhotoPlaceholder" class="large-photo-placeholder">Click to upload<br>student photo
+                        </div>
+                    </div>
 
-                <!-- Expiry Date -->
-                <div class="expiry-section">
-                    EXPIRES: <input type="text" class="editable" id="expiryDate" value="08-18-2029"
-                        style="width: 90px;">
+                    <!-- Student Badge -->
+                    <div class="student-badge">STUDENT</div>
+
+                    <!-- Expiry Date -->
+                    <div class="expiry-section">
+                        EXPIRES: <input type="text" class="editable" id="expiryDate" value="08-18-2029"
+                            style="width: 90px;">
+                    </div>
                 </div>
             </div>
         </div>
@@ -611,27 +632,125 @@
         }
 
         function downloadCard() {
-            const card = document.getElementById('studentCard');
-
-            // Sử dụng html2canvas để chụp ảnh thẻ
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            script.onload = function () {
-                html2canvas(card, {
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: null,
-                    width: 856,
-                    height: 540
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'santa-fe-student-id-card.png';
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    link.click();
-                });
+            // Tạo canvas để vẽ background mặt bàn gỗ và thẻ
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Kích thước canvas (rộng hơn để có không gian cho background)
+            canvas.width = 1200;
+            canvas.height = 800;
+            
+            // Vẽ background mặt bàn gỗ
+            const woodImg = new Image();
+            woodImg.crossOrigin = 'anonymous';
+            woodImg.onload = function() {
+                // Vẽ background mặt bàn gỗ
+                ctx.drawImage(woodImg, 0, 0, canvas.width, canvas.height);
+                
+                // Thêm một lớp overlay để làm tối background một chút
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Vẽ shadow của thẻ
+                const shadowGradient = ctx.createRadialGradient(
+                    canvas.width/2, canvas.height/2 + 20, 0,
+                    canvas.width/2, canvas.height/2 + 20, 400
+                );
+                shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+                shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = shadowGradient;
+                ctx.fillRect(canvas.width/2 - 450, canvas.height/2 - 250, 900, 500);
+                
+                // Sử dụng html2canvas để capture thẻ
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function () {
+                    const card = document.getElementById('studentCard');
+                    html2canvas(card, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: null,
+                        width: 856,
+                        height: 540
+                    }).then(cardCanvas => {
+                        // Vẽ thẻ lên canvas background
+                        const cardX = (canvas.width - 856) / 2;
+                        const cardY = (canvas.height - 540) / 2;
+                        ctx.drawImage(cardCanvas, cardX, cardY);
+                        
+                        // Download ảnh kết hợp
+                        const link = document.createElement('a');
+                        link.download = 'santa-fe-student-id-on-desk.png';
+                        link.href = canvas.toDataURL('image/png', 1.0);
+                        link.click();
+                    });
+                };
+                document.head.appendChild(script);
             };
-            document.head.appendChild(script);
+            
+            woodImg.onerror = function() {
+                // Fallback nếu không load được ảnh gỗ
+                // Tạo background gỗ giả bằng gradient
+                const woodGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                woodGradient.addColorStop(0, '#8B7355');
+                woodGradient.addColorStop(0.2, '#A0926B');
+                woodGradient.addColorStop(0.4, '#8B7355');
+                woodGradient.addColorStop(0.6, '#96885F');
+                woodGradient.addColorStop(0.8, '#8B7355');
+                woodGradient.addColorStop(1, '#A0926B');
+                
+                ctx.fillStyle = woodGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Thêm texture lines cho gỗ
+                ctx.strokeStyle = 'rgba(139, 115, 85, 0.3)';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < canvas.height; i += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i + Math.sin(i * 0.01) * 10);
+                    ctx.stroke();
+                }
+                
+                // Vẽ shadow của thẻ
+                const shadowGradient = ctx.createRadialGradient(
+                    canvas.width/2, canvas.height/2 + 20, 0,
+                    canvas.width/2, canvas.height/2 + 20, 400
+                );
+                shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+                shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = shadowGradient;
+                ctx.fillRect(canvas.width/2 - 450, canvas.height/2 - 250, 900, 500);
+                
+                // Tiếp tục với việc capture thẻ
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function () {
+                    const card = document.getElementById('studentCard');
+                    html2canvas(card, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: null,
+                        width: 856,
+                        height: 540
+                    }).then(cardCanvas => {
+                        const cardX = (canvas.width - 856) / 2;
+                        const cardY = (canvas.height - 540) / 2;
+                        ctx.drawImage(cardCanvas, cardX, cardY);
+                        
+                        const link = document.createElement('a');
+                        link.download = 'santa-fe-student-id-on-desk.png';
+                        link.href = canvas.toDataURL('image/png', 1.0);
+                        link.click();
+                    });
+                };
+                document.head.appendChild(script);
+            };
+            
+            // Sử dụng ảnh mặt bàn gỗ từ link bạn cung cấp
+            woodImg.src = 'https://media.istockphoto.com/id/1400136454/vi/anh/k%E1%BA%BFt-c%E1%BA%A5u-t%E1%BA%A5m-v%C3%A1n-g%E1%BB%97-n%E1%BB%81n-b%C3%A0n-g%E1%BB%97-g%E1%BB%A5-l%E1%BB%97i-th%E1%BB%9Di.jpg';
         }
 
         // Xử lý dán ảnh từ clipboard
@@ -679,20 +798,20 @@
 
         function copyScript() {
             const fullName = document.getElementById('studentNameMain').value.trim();
-    const nameParts = fullName.split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@sfcollege.edu`; // tạo giả
+            const nameParts = fullName.split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts[nameParts.length - 1] || '';
+            const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@sfcollege.edu`;
 
-    const birthDateRaw = document.getElementById('birthDate').value.trim(); // MM-DD-YYYY
-    const [monthNum, day, year] = birthDateRaw.split('-');
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
-    const monthName = monthNames[parseInt(monthNum) - 1] || 'January';
+            const birthDateRaw = document.getElementById('birthDate').value.trim();
+            const [monthNum, day, year] = birthDateRaw.split('-');
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"];
+            const monthName = monthNames[parseInt(monthNum) - 1] || 'January';
 
-    const university = "Santa Fe College";
+            const university = "Santa Fe College";
 
-    const script = `(async () => {
+            const script = `(async () => {
   const delay = ms => new Promise(r => setTimeout(r, ms));
   const set = async (sel, val) => {
     const el = document.querySelector(sel);
@@ -701,64 +820,4 @@
     setVal.call(el, val);
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
-    el.dispatchEvent(new Event("blur", { bubbles: true }));
-    await delay(150);
-  };
-
-  const pasteSchool = async (val) => {
-    const el = document.querySelector('#sid-college-name');
-    if (!el) return;
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, val);
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    await delay(2000);
-    document.querySelector('#sid-college-name-menu [role="option"]')?.click();
-  };
-
-  const selectMonth = async () => {
-    const el = document.querySelector('#sid-birthdate__month');
-    if (!el) return;
-    el.focus();
-    el.click();
-    await delay(400);
-    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
-    await delay(400);
-    [...document.querySelectorAll('#sid-birthdate__month-menu [role="option"]')]
-      .find(o => o.innerText.toLowerCase().startsWith("${monthName.toLowerCase()}"))?.click();
-  };
-
-  await pasteSchool("${university}");
-  await selectMonth();
-
-  const fields = [
-    ['#sid-first-name', '${firstName}'],
-    ['#sid-last-name', '${lastName}'],
-    ['#sid-birthdate-day', '${day}'],
-    ['#sid-birthdate-year', '${year}'],
-    ['#sid-email', '${email}']
-  ];
-
-  for (const [sel, val] of fields) await set(sel, val);
-  for (const [sel, val] of fields)
-    if (!document.querySelector(sel)?.value) await set(sel, val);
-
-  console.log("✅ Form đã được điền đầy đủ (chưa submit)");
-  console.log("📋 Thông tin đã điền:", {
-    name: "${firstName} ${lastName}",
-    birthdate: "${day}/${monthName}/${year}",
-    email: "${email}",
-    school: "${university}"
-  });
-})();`;
-
-    // Copy vào clipboard
-    navigator.clipboard.writeText(script).then(() => {
-        alert("✅ Script đã được tạo và copy vào clipboard!");
-    }).catch(err => {
-        console.error("❌ Không thể copy script:", err);
-        alert("❌ Lỗi khi copy script.");
-    });
-}
-    </script>
-</body>
-
-</html>
+    el.dispatch
