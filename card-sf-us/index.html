@@ -221,7 +221,7 @@
         .small-photo-placeholder {
             width: 120px;
             height: 160px;
-            border: 2px solid #ccc;
+            border: 2px solid #ddd;
             border-radius: 6px;
             background: #f8f9fa;
             display: flex;
@@ -634,8 +634,11 @@
         function downloadCard() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 1200;
-            canvas.height = 800;
+            const scale = 2; // For higher resolution
+            const cardWidth = 856 * scale;
+            const cardHeight = 540 * scale;
+            canvas.width = cardWidth + 688; // Scaled padding: original 172*2 = 344 per side, 344*2 = 688 total
+            canvas.height = cardHeight + 520; // Scaled padding: original 130*2 = 260 per side, 260*2 = 520 total
 
             const woodImg = new Image();
             woodImg.crossOrigin = 'anonymous';
@@ -653,28 +656,28 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 const shadowGradient = ctx.createRadialGradient(
-                    canvas.width / 2, canvas.height / 2 + 20, 0,
-                    canvas.width / 2, canvas.height / 2 + 20, 400
+                    canvas.width / 2, canvas.height / 2 + 40, 0,
+                    canvas.width / 2, canvas.height / 2 + 40, 800
                 );
                 shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
                 shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = shadowGradient;
-                ctx.fillRect(canvas.width / 2 - 450, canvas.height / 2 - 250, 900, 500);
+                ctx.fillRect(canvas.width / 2 - 900, canvas.height / 2 - 500, 1800, 1000);
 
                 const script = document.createElement('script');
                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
                 script.onload = function () {
                     const card = document.getElementById('studentCard');
                     html2canvas(card, {
-                        scale: 2,
+                        scale: scale,
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: null,
                         width: 856,
                         height: 540
                     }).then(cardCanvas => {
-                        const cardX = (canvas.width - 856) / 2;
-                        const cardY = (canvas.height - 540) / 2;
+                        const cardX = (canvas.width - cardCanvas.width) / 2;
+                        const cardY = (canvas.height - cardCanvas.height) / 2;
                         ctx.drawImage(cardCanvas, cardX, cardY);
 
                         const link = document.createElement('a');
@@ -699,15 +702,15 @@
                 script.onload = function () {
                     const card = document.getElementById('studentCard');
                     html2canvas(card, {
-                        scale: 2,
+                        scale: scale,
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: null,
                         width: 856,
                         height: 540
                     }).then(cardCanvas => {
-                        const cardX = (canvas.width - 856) / 2;
-                        const cardY = (canvas.height - 540) / 2;
+                        const cardX = (canvas.width - cardCanvas.width) / 2;
+                        const cardY = (canvas.height - cardCanvas.height) / 2;
                         ctx.drawImage(cardCanvas, cardX, cardY);
 
                         const link = document.createElement('a');
@@ -764,16 +767,63 @@
             const monthName = monthNames[parseInt(monthNum) - 1] || 'January';
             const university = "Santa Fe College";
 
-            const script = `
-Student Information:
-Name: ${fullName}
-Email: ${email}
-SFID: ${studentId}
-Date of Birth: ${monthName} ${day}, ${year}
-Date Issued: ${issueDate}
-Expires: ${expiryDate}
-University: ${university}
-            `;
+            const script = `(async () => {
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const set = async (sel, val) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const setVal = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+    setVal.call(el, val);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new Event("blur", { bubbles: true }));
+    await delay(150);
+  };
+
+  const pasteSchool = async (val) => {
+    const el = document.querySelector('#sid-college-name');
+    if (!el) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, val);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    await delay(2000);
+    document.querySelector('#sid-college-name-menu [role="option"]')?.click();
+  };
+
+  const selectMonth = async () => {
+    const el = document.querySelector('#sid-birthdate__month');
+    if (!el) return;
+    el.focus();
+    el.click();
+    await delay(400);
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await delay(400);
+    [...document.querySelectorAll('#sid-birthdate__month-menu [role="option"]')]
+      .find(o => o.innerText.toLowerCase().startsWith("${monthName.toLowerCase()}"))?.click();
+  };
+
+  await pasteSchool("${university}");
+  await selectMonth();
+
+  const fields = [
+    ['#sid-first-name', '${firstName}'],
+    ['#sid-last-name', '${lastName}'],
+    ['#sid-birthdate-day', '${day}'],
+    ['#sid-birthdate-year', '${year}'],
+    ['#sid-email', '${email}']
+  ];
+
+  for (const [sel, val] of fields) await set(sel, val);
+  for (const [sel, val] of fields)
+    if (!document.querySelector(sel)?.value) await set(sel, val);
+
+  console.log("✅ Form đã được điền đầy đủ (chưa submit)");
+  console.log("📋 Thông tin đã điền:", {
+    name: "${firstName} ${lastName}",
+    birthdate: "${day}/${monthName}/${year}",
+    email: "${email}",
+    school: "${university}"
+  });
+})();`;
 
             navigator.clipboard.writeText(script).then(() => {
                 alert('Student information copied to clipboard!');
